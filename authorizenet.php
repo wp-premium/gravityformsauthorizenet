@@ -3,14 +3,14 @@
 Plugin Name: Gravity Forms Authorize.Net Add-On
 Plugin URI: http://www.gravityforms.com
 Description: Integrates Gravity Forms with Authorize.Net, enabling end users to purchase goods and services through Gravity Forms.
-Version: 2.1
+Version: 2.2
 Author: rocketgenius
 Author URI: http://www.rocketgenius.com
 Text Domain: gravityformsauthorizenet
 Domain Path: /languages
 
 ------------------------------------------------------------------------
-Copyright 2009-2014 rocketgenius
+Copyright 2009-2016 rocketgenius
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-define( 'GF_AUTHORIZENET_VERSION', '2.1' );
+define( 'GF_AUTHORIZENET_VERSION', '2.2' );
 
 add_action( 'gform_loaded', array( 'GF_AuthorizeNet_Bootstrap', 'load' ), 5 );
 

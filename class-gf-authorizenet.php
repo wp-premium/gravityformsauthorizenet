@@ -5,7 +5,7 @@ GFForms::include_payment_addon_framework();
 class GFAuthorizeNet extends GFPaymentAddOn {
 
 	protected $_version = GF_AUTHORIZENET_VERSION;
-	protected $_min_gravityforms_version = '1.9.3';
+	protected $_min_gravityforms_version = '1.9.12';
 	protected $_slug = 'gravityformsauthorizenet';
 	protected $_path = 'gravityformsauthorizenet/authorizenet.php';
 	protected $_full_path = __FILE__;
@@ -29,6 +29,11 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 	// Automatic upgrade enabled
 	protected $_enable_rg_autoupgrade = true;
+
+	/**
+	 * @var array $_args_for_deprecated_hooks Will hold a few arrays which are needed by some deprecated hooks, keeping them out of the $authorization array so that potentially sensitive data won't be exposed in logging statements.
+	 */
+	private $_args_for_deprecated_hooks = array();
 
 	private static $_instance = null;
 
@@ -92,17 +97,17 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		</script>
 
 		<div class="wrap about-wrap">
-			<h1><?php _e( 'Authorize.Net Add-On v2.0', 'gravityformsauthorizenet' ) ?></h1>
+			<h1><?php esc_html_e( 'Authorize.Net Add-On v2.0', 'gravityformsauthorizenet' ) ?></h1>
 
 			<div
-				class="about-text"><?php _e( 'Thank you for updating! The new version of the Gravity Forms Authorize.Net Add-On makes changes to how you manage your Authorize.Net integration.', 'gravityformsauthorizenet' ) ?></div>
+				class="about-text"><?php esc_html_e( 'Thank you for updating! The new version of the Gravity Forms Authorize.Net Add-On makes changes to how you manage your Authorize.Net integration.', 'gravityformsauthorizenet' ) ?></div>
 			<div class="changelog">
 				<hr/>
 				<div class="feature-section col two-col">
 					<div class="col-1">
-						<h3><?php _e( 'Manage Authorize.Net Contextually', 'gravityformsauthorizenet' ) ?></h3>
+						<h3><?php esc_html_e( 'Manage Authorize.Net Contextually', 'gravityformsauthorizenet' ) ?></h3>
 
-						<p><?php _e( 'Authorize.Net Feeds are now accessed via the Authorize.Net sub-menu within the Form Settings for the Form with which you would like to integrate Authorize.Net.', 'gravityformsauthorizenet' ) ?></p>
+						<p><?php esc_html_e( 'Authorize.Net Feeds are now accessed via the Authorize.Net sub-menu within the Form Settings for the Form with which you would like to integrate Authorize.Net.', 'gravityformsauthorizenet' ) ?></p>
 					</div>
 					<div class="col-2 last-feature">
 						<img src="http://gravityforms.s3.amazonaws.com/webimages/AddonNotice/NewAuthorizeNet2.png">
@@ -113,9 +118,9 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 				<form method="post" id="dismiss_menu_form" style="margin-top: 20px;">
 					<input type="checkbox" name="dismiss_authorizenet_menu" value="1" onclick="dismissMenu();">
-					<label><?php _e( 'I understand this change, dismiss this message!', 'gravityformsauthorizenet' ) ?></label>
+					<label><?php esc_html_e( 'I understand this change, dismiss this message!', 'gravityformsauthorizenet' ) ?></label>
 					<img id="gf_spinner" src="<?php echo GFCommon::get_base_url() . '/images/spinner.gif' ?>"
-					     alt="<?php _e( 'Please wait...', 'gravityformsauthorizenet' ) ?>" style="display:none;"/>
+					     alt="<?php esc_html_e( 'Please wait...', 'gravityformsauthorizenet' ) ?>" style="display:none;"/>
 				</form>
 
 			</div>
@@ -125,25 +130,25 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 	//----- SETTINGS PAGES ----------//
 	public function plugin_settings_fields() {
-		$description = '<p style="text-align: left;">' . __( sprintf( 'Authorize.Net is a payment gateway for merchants. Use Gravity Forms to collect payment information and automatically integrate to your Authorize.Net account. If you don\'t have a Authorize.Net account, you can %ssign up for one here%s', '<a href="http://www.authorizenet.com" target="_blank">', '</a>' ), 'gravityformsauthorizenet' ) . '</p>';
+		$description = '<p style="text-align: left;">' . sprintf( esc_html__( 'Authorize.Net is a payment gateway for merchants. Use Gravity Forms to collect payment information and automatically integrate to your Authorize.Net account. If you don\'t have a Authorize.Net account, you can %ssign up for one here%s', 'gravityformsauthorizenet' ), '<a href="http://www.authorizenet.com" target="_blank">', '</a>' ) . '</p>';
 
 		return array(
 			array(
-				'title'       => __( 'Authorize.Net Account Information', 'gravityformsauthorizenet' ),
+				'title'       => esc_html__( 'Authorize.Net Account Information', 'gravityformsauthorizenet' ),
 				'description' => $description,
 				'fields'      => array(
 					array(
 						'name'          => 'mode',
-						'label'         => __( 'Mode', 'gravityformsauthorizenet' ),
+						'label'         => esc_html__( 'Mode', 'gravityformsauthorizenet' ),
 						'type'          => 'radio',
 						'default_value' => 'test',
 						'choices'       => array(
 							array(
-								'label' => __( 'Production', 'gravityformsauthorizenet' ),
+								'label' => esc_html__( 'Production', 'gravityformsauthorizenet' ),
 								'value' => 'production',
 							),
 							array(
-								'label' => __( 'Test', 'gravityformsauthorizenet' ),
+								'label' => esc_html__( 'Test', 'gravityformsauthorizenet' ),
 								'value' => 'test',
 							),
 						),
@@ -151,7 +156,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 					),
 					array(
 						'name'              => 'loginId',
-						'label'             => __( 'API Login ID', 'gravityformsauthorizenet' ),
+						'label'             => esc_html__( 'API Login ID', 'gravityformsauthorizenet' ),
 						'type'              => 'api_login',
 						'class'             => 'medium',
 						'feedback_callback' => array( $this, 'is_valid_plugin_key' ),
@@ -159,7 +164,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 					),
 					array(
 						'name'              => 'transactionKey',
-						'label'             => __( 'Transaction Key', 'gravityformsauthorizenet' ),
+						'label'             => esc_html__( 'Transaction Key', 'gravityformsauthorizenet' ),
 						'type'              => 'api_key',
 						'class'             => 'medium',
 						'feedback_callback' => array( $this, 'is_valid_plugin_key' ),
@@ -167,7 +172,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				),
 			),
 			array(
-				'title'  => __( 'Automated Recurring Billing Setup', 'gravityformsauthorizenet' ),
+				'title'  => esc_html__( 'Automated Recurring Billing Setup', 'gravityformsauthorizenet' ),
 				'fields' => array(
 					array(
 						'name'    => 'arb',
@@ -175,7 +180,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 						'type'    => 'checkbox',
 						'choices' => array(
 							array(
-								'label' => __( 'ARB is setup in my Authorize.Net account.', 'gravityformsauthorizenet' ),
+								'label' => esc_html__( 'ARB is setup in my Authorize.Net account.', 'gravityformsauthorizenet' ),
 								'name'  => 'arb'
 							)
 						),
@@ -183,7 +188,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				),
 				array(
 					'type'     => 'save',
-					'messages' => array( 'success' => __( 'Settings updated successfully', 'gravityformsauthorizenet' ) )
+					'messages' => array( 'success' => esc_html__( 'Settings updated successfully', 'gravityformsauthorizenet' ) )
 
 				),
 			),
@@ -194,7 +199,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 		$api_login_field = $this->settings_text( $field, false );
 
-		$caption = sprintf( __( 'You can find your unique %sAPI Login ID%s by clicking on the \'Account\' link at the Authorize.Net Merchant Interface. Then click \'API Login ID and Transaction Key\'. Your API Login ID will be displayed.', 'gravityformsauthorizenet' ), '<strong>', '</strong>' );
+		$caption = sprintf( esc_html__( 'You can find your unique %sAPI Login ID%s by clicking on the \'Account\' link at the Authorize.Net Merchant Interface. Then click \'API Login ID and Transaction Key\'. Your API Login ID will be displayed.', 'gravityformsauthorizenet' ), '<strong>', '</strong>' );
 
 		if ( $echo ) {
 			echo $api_login_field . '</br><small>' . $caption . '</small>';
@@ -208,7 +213,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 		$api_key_field = $this->settings_text( $field, false );
 
-		$caption = sprintf( __( 'You can find your unique %sTransaction Key%s by clicking on the \'Account\' link at the Authorize.Net Merchant Interface. Then click \'API Login ID and Transaction Key\'. For security reasons, you cannot view your Transaction Key, but you will be able to generate a new one.', 'gravityformsauthorizenet' ), '<strong>', '</strong>' );
+		$caption = sprintf( esc_html__( 'You can find your unique %sTransaction Key%s by clicking on the \'Account\' link at the Authorize.Net Merchant Interface. Then click \'API Login ID and Transaction Key\'. For security reasons, you cannot view your Transaction Key, but you will be able to generate a new one.', 'gravityformsauthorizenet' ), '<strong>', '</strong>' );
 
 		if ( $echo ) {
 			echo $api_key_field . '</br><small>' . $caption . '</small>';
@@ -245,6 +250,8 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		//13 - The merchant login ID or password is invalid or the account is inactive.
 		//103 -
 		if ( $failure && ( $response_reason_code == 13 || $response_reason_code == 103 ) ) {
+			$this->log_debug( __METHOD__ . '(): ' . $response->error_message );
+
 			return false;
 		} else {
 			return true;
@@ -265,6 +272,10 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		}
 
 		$is_sandbox = $api_settings['mode'] == 'test';
+
+		if ( $is_sandbox ) {
+			$this->log_debug( __METHOD__ . '(): In test mode. Using the Authorize.net Sandbox.' );
+		}
 
 		$aim = new AuthorizeNetAIM( $api_settings['login_id'], $api_settings['transaction_key'] );
 		$aim->setSandbox( $is_sandbox );
@@ -329,23 +340,15 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 
 	//-------- Form Settings ---------
-	public function feed_edit_page( $form, $feed_id ) {
 
-		// ensures valid credentials were entered in the settings page
-		if ( $this->is_valid_plugin_key() === false ) {
-			?>
-			<div><?php echo sprintf( __( 'We are unable to connect to Authorize.net with the provided API credentials. Please make sure you have entered valid API credentials in the %sSettings Page%s', 'gravityformscampaignmonitor' ),
-					'<a href="' . esc_url( $this->get_plugin_settings_url() ) . '">', '</a>' ); ?>
-			</div>
-			<?php
-			return;
-		}
-
-		echo '<script type="text/javascript">var form = ' . GFCommon::json_encode( $form ) . ';</script>';
-
-		parent::feed_edit_page( $form, $feed_id );
+	/**
+	 * Prevent feeds being listed or created if the api keys aren't valid.
+	 *
+	 * @return bool
+	 */
+	public function can_create_feed() {
+		return $this->is_valid_plugin_key();
 	}
-
 
 	public function feed_settings_fields() {
 		$default_settings = parent::feed_settings_fields();
@@ -356,9 +359,9 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$fields = array(
 			array(
 				'name'    => 'options',
-				'label'   => __( 'Options', 'gravityformsauthorizenet' ),
+				'label'   => esc_html__( 'Options', 'gravityformsauthorizenet' ),
 				'type'    => 'options',
-				'tooltip' => '<h6>' . __( 'Options', 'gravityformsauthorizenet' ) . '</h6>' . __( 'Turn on or off the available Authorize.Net checkout options.', 'gravityformsauthorizenet' ),
+				'tooltip' => '<h6>' . esc_html__( 'Options', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Turn on or off the available Authorize.Net checkout options.', 'gravityformsauthorizenet' ),
 			),
 		);
 
@@ -368,12 +371,12 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			if ( $this->get_setting( 'transactionType' ) == 'subscription' ) {
 				$post_settings = array(
 					'name'    => 'post_checkboxes',
-					'label'   => __( 'Posts', 'gravityformsauthorizenet' ),
+					'label'   => esc_html__( 'Posts', 'gravityformsauthorizenet' ),
 					'type'    => 'checkbox',
-					'tooltip' => '<h6>' . __( 'Posts', 'gravityformsauthorizenet' ) . '</h6>' . __( 'Enable this option if you would like to change the post status when a subscription is canceled.', 'gravityformsauthorizenet' ),
+					'tooltip' => '<h6>' . esc_html__( 'Posts', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Enable this option if you would like to change the post status when a subscription is canceled.', 'gravityformsauthorizenet' ),
 					'choices' => array(
 						array(
-							'label'    => __( 'Change post status when subscription is canceled.', 'gravityformsauthorizenet' ),
+							'label'    => esc_html__( 'Change post status when subscription is canceled.', 'gravityformsauthorizenet' ),
 							'name'     => 'change_post_status',
 							'onChange' => 'var action = this.checked ? "draft" : ""; jQuery("#update_post_action").val(action);',
 						),
@@ -389,9 +392,9 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$fields = array(
 			array(
 				'name'     => 'apiSettingsEnabled',
-				'label'    => __( 'API Settings', 'gravityformsauthorizenet' ),
+				'label'    => esc_html__( 'API Settings', 'gravityformsauthorizenet' ),
 				'type'     => 'checkbox',
-				'tooltip'  => '<h6>' . __( 'API Settings', 'gravityformsauthorizenet' ) . '</h6>' . __( 'Override the settings provided on the Authorize.Net Settings page and use these instead for this feed.', 'gravityformsauthorizenet' ),
+				'tooltip'  => '<h6>' . esc_html__( 'API Settings', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Override the settings provided on the Authorize.Net Settings page and use these instead for this feed.', 'gravityformsauthorizenet' ),
 				'onchange' => "if(jQuery(this).prop('checked')){
 										jQuery('#gaddon-setting-row-overrideMode').show();
 										jQuery('#gaddon-setting-row-overrideLogin').show();
@@ -413,18 +416,18 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			),
 			array(
 				'name'          => 'overrideMode',
-				'label'         => __( 'Mode', 'gravityformsauthorizenet' ),
+				'label'         => esc_html__( 'Mode', 'gravityformsauthorizenet' ),
 				'type'          => 'radio',
 				'default_value' => 'test',
 				'hidden'        => ! $this->get_setting( 'apiSettingsEnabled' ),
-				'tooltip'       => '<h6>' . __( 'Mode', 'gravityformsauthorizenet' ) . '</h6>' . __( 'Select either Production or Test mode to override the chosen mode on the Authorize.Net Settings page.', 'gravityformsauthorizenet' ),
+				'tooltip'       => '<h6>' . esc_html__( 'Mode', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Select either Production or Test mode to override the chosen mode on the Authorize.Net Settings page.', 'gravityformsauthorizenet' ),
 				'choices'       => array(
 					array(
-						'label' => __( 'Production', 'gravityformsauthorizenet' ),
+						'label' => esc_html__( 'Production', 'gravityformsauthorizenet' ),
 						'value' => 'production',
 					),
 					array(
-						'label' => __( 'Test', 'gravityformsauthorizenet' ),
+						'label' => esc_html__( 'Test', 'gravityformsauthorizenet' ),
 						'value' => 'test',
 					),
 				),
@@ -432,20 +435,20 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			),
 			array(
 				'name'              => 'overrideLogin',
-				'label'             => __( 'API Login ID', 'gravityformsauthorizenet' ),
+				'label'             => esc_html__( 'API Login ID', 'gravityformsauthorizenet' ),
 				'type'              => 'text',
 				'class'             => 'medium',
 				'hidden'            => ! $this->get_setting( 'apiSettingsEnabled' ),
-				'tooltip'           => '<h6>' . __( 'API Login ID', 'gravityformsauthorizenet' ) . '</h6>' . __( 'Enter a new value to override the API Login ID on the Authorize.Net Settings page.', 'gravityformsauthorizenet' ),
+				'tooltip'           => '<h6>' . esc_html__( 'API Login ID', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Enter a new value to override the API Login ID on the Authorize.Net Settings page.', 'gravityformsauthorizenet' ),
 				'feedback_callback' => array( $this, 'is_valid_custom_key' ),
 			),
 			array(
 				'name'              => 'overrideKey',
-				'label'             => __( 'Transaction Key', 'gravityformsauthorizenet' ),
+				'label'             => esc_html__( 'Transaction Key', 'gravityformsauthorizenet' ),
 				'type'              => 'text',
 				'class'             => 'medium',
 				'hidden'            => ! $this->get_setting( 'apiSettingsEnabled' ),
-				'tooltip'           => '<h6>' . __( 'Transaction Key', 'gravityformsauthorizenet' ) . '</h6>' . __( 'Enter a new value to override the Transaction Key on the Authorize.Net Settings page.', 'gravityformsauthorizenet' ),
+				'tooltip'           => '<h6>' . esc_html__( 'Transaction Key', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Enter a new value to override the Transaction Key on the Authorize.Net Settings page.', 'gravityformsauthorizenet' ),
 				'feedback_callback' => array( $this, 'is_valid_custom_key' ),
 			),
 		);
@@ -461,7 +464,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			'type'    => 'checkboxes',
 			'choices' => array(
 				array(
-					'label' => __( 'Send Authorize.Net email receipt.', 'gravityformsauthorizenet' ),
+					'label' => esc_html__( 'Send Authorize.Net email receipt.', 'gravityformsauthorizenet' ),
 					'name'  => 'enableReceipt'
 				),
 			)
@@ -483,8 +486,8 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			'name'     => 'update_post_action',
 			'choices'  => array(
 				array( 'label' => '' ),
-				array( 'label' => __( 'Mark Post as Draft', 'gravityformsauthorizenet' ), 'value' => 'draft' ),
-				array( 'label' => __( 'Delete Post', 'gravityformsauthorizenet' ), 'value' => 'delete' ),
+				array( 'label' => esc_html__( 'Mark Post as Draft', 'gravityformsauthorizenet' ), 'value' => 'draft' ),
+				array( 'label' => esc_html__( 'Delete Post', 'gravityformsauthorizenet' ), 'value' => 'delete' ),
 
 			),
 			'onChange' => "var checked = jQuery(this).val() ? 'checked' : false; jQuery('#change_post_status').attr('checked', checked);",
@@ -497,11 +500,51 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 	public function supported_billing_intervals() {
 		//authorize.net does not use years or weeks, override framework function
 		$billing_cycles = array(
-			'day'   => array( 'label' => __( 'day(s)', 'gravityforms' ), 'min' => 7, 'max' => 365 ),
-			'month' => array( 'label' => __( 'month(s)', 'gravityforms' ), 'min' => 1, 'max' => 12 )
+			'day'   => array( 'label' => esc_html__( 'day(s)', 'gravityformsauthorizenet' ), 'min' => 7, 'max' => 365 ),
+			'month' => array( 'label' => esc_html__( 'month(s)', 'gravityformsauthorizenet' ), 'min' => 1, 'max' => 12 )
 		);
 
 		return $billing_cycles;
+	}
+
+	/**
+	 * Append the phone field to the default billing_info_fields added by the framework.
+	 *
+	 * @return array
+	 */
+	public function billing_info_fields() {
+
+		$fields = parent::billing_info_fields();
+
+		$fields[] = array(
+				'name'     => 'phone',
+				'label'    => esc_html__( 'Phone', 'gravityformsauthorizenet' ),
+				'required' => false
+		);
+
+		return $fields;
+	}
+
+	/**
+	 * Add supported notification events.
+	 *
+	 * @param array $form The form currently being processed.
+	 *
+	 * @return array
+	 */
+	public function supported_notification_events( $form ) {
+		if ( ! $this->has_feed( $form['id'] ) ) {
+			return false;
+		}
+
+		return array(
+				'complete_payment'          => esc_html__( 'Payment Completed', 'gravityformsauthorizenet' ),
+				'create_subscription'       => esc_html__( 'Subscription Created', 'gravityformsauthorizenet' ),
+				'cancel_subscription'       => esc_html__( 'Subscription Canceled', 'gravityformsauthorizenet' ),
+				'expire_subscription'       => esc_html__( 'Subscription Expired', 'gravityformsauthorizenet' ),
+				'add_subscription_payment'  => esc_html__( 'Subscription Payment Added', 'gravityformsauthorizenet' ),
+				'fail_subscription_payment' => esc_html__( 'Subscription Payment Failed', 'gravityformsauthorizenet' ),
+		);
 	}
 
 	// used to upgrade old feeds into new version
@@ -725,24 +768,31 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$form_data = $this->get_form_data( $submission_data, $form, $config );
 
 		$transaction = apply_filters( 'gform_authorizenet_transaction_pre_authorize', $original_transaction, $form_data, $config, $form );
-		$transaction = apply_filters( 'gform_authorizenet_transaction_pre_capture', $transaction, $form_data, $config, $form );
+		$transaction = apply_filters( 'gform_authorizenet_transaction_pre_capture', $transaction, $form_data, $config, $form, $entry );
 
 		//Check if transaction is false after gform_authorizenet_transaction_pre_capture filter. If false, payment is not captured; run authorizeOnly transaction
 		if ( ! $transaction ) {
 
 			$this->log_debug( __METHOD__ . '(): Running authorization only. The gform_authorizenet_transaction_pre_capture filter was used to set the transaction to false.' );
 
-			$auth_amount = apply_filters( 'gform_authorizenet_amount_pre_authorize', $form_data['amount'] + floatval( $form_data['fee_amount'] ), $original_transaction, $form_data, $config, $form );
+			$auth_amount = apply_filters( 'gform_authorizenet_amount_pre_authorize', $form_data['amount'] + floatval( $form_data['fee_amount'] ), $original_transaction, $form_data, $config, $form, $entry );
 
 			$response = $original_transaction->authorizeOnly( $auth_amount );
 
 			if ( $response->approved || $response->held ) {
+				$this->log_debug( __METHOD__ . "(): Authorization successful. Amount: {$response->amount}. Transaction Id: {$response->transaction_id}." );
 
-				$this->log_debug( __METHOD__ . '(): Authorization response => ' . print_r( $response, true ) );
+				$auth = array(
+					'is_authorized'  => true,
+					'transaction_id' => $response->transaction_id,
+				);
 
-				$auth = array( 'is_authorized' => true, 'transaction_id' => $response->transaction_id );
+				$this->_args_for_deprecated_hooks = array(
+					'aim_response' => $response,
+					'config'       => $config,
+				);
 			} else {
-				$this->log_error( __METHOD__ . '(): Authorization failed. Response => ' . print_r( $response, true ) );
+				$this->log_error( __METHOD__ . '(): Authorization failed. Response => ' . print_r( $response->error_message, true ) );
 
 				// needed for filter backwards compatibility (gform_authorizenet_validation_message)
 				$error_message     = $this->get_error_message( $_POST, $response, 'aim' );
@@ -767,21 +817,24 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 		if ( $response->approved || $response->held ) {
 			$this->log_debug( __METHOD__ . "(): Funds captured successfully. Amount: {$response->amount}. Transaction Id: {$response->transaction_id}." );
-			$captured_payment = array(
-				'is_success'     => true,
-				'error_message'  => '',
-				'transaction_id' => $response->transaction_id,
-				'amount'         => $response->amount
-			);
-			$auth             = array(
+
+			$auth = array(
 				'is_authorized'    => true,
 				'transaction_id'   => $response->transaction_id,
-				'captured_payment' => $captured_payment,
-				'aim_response'     => $response,
-				'config'           => $config
+				'captured_payment' => array(
+					'is_success'     => true,
+					'error_message'  => '',
+					'transaction_id' => $response->transaction_id,
+					'amount'         => $response->amount
+				),
+			);
+
+			$this->_args_for_deprecated_hooks = array(
+				'aim_response' => $response,
+				'config'       => $config,
 			);
 		} else {
-			$this->log_error( __METHOD__ . '(): Funds could not be captured. Response => ' . print_r( $response, true ) );
+			$this->log_error( __METHOD__ . '(): Funds could not be captured. Response => ' . print_r( $response->error_message, true ) );
 
 			// needed for filter backwards compatibility (gform_authorizenet_validation_message)
 			$error_message     = $this->get_error_message( $_POST, $response, 'aim' );
@@ -789,9 +842,12 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			$error_message     = apply_filters( 'gform_authorizenet_validation_message', $error_message, $validation_result, $_POST, $response, 'aim' );
 
 			$auth = array(
-				'is_success'     => false,
-				'transaction_id' => $response->transaction_id,
-				'error_message'  => $error_message
+				'is_authorized'    => false,
+				'transaction_id'   => $response->transaction_id,
+				'error_message'    => $error_message,
+				'captured_payment' => array(
+					'is_success' => false,
+				)
 			);
 		}
 
@@ -802,6 +858,9 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 	public function get_payment_transaction( $feed, $submission_data, $form, $entry ) {
 
 		$transaction = $this->get_aim();
+
+		$feed_name = rgar( $feed['meta'], 'feedName' );
+		$this->log_debug( __METHOD__ . "(): Initializing new AuthorizeNetAIM object based on feed #{$feed['id']} - {$feed_name}." );
 
 		$transaction->amount    = $submission_data['payment_amount'];
 		$transaction->card_num  = $submission_data['card_number'];
@@ -824,11 +883,14 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$transaction->duplicate_window = 5;
 		$transaction->customer_ip      = GFFormsModel::get_ip();
 		$transaction->invoice_num      = empty( $invoice_number ) ? uniqid() : $invoice_number; //???
+		$transaction->phone            = $submission_data['phone'];
 
 		foreach ( $submission_data['line_items'] as $line_item ) {
 			$transaction->addLineItem( $line_item['id'], $this->remove_spaces( $this->truncate( $line_item['name'], 31 ) ), $this->truncate( $line_item['description'], 255 ), $line_item['quantity'], GFCommon::to_number( $line_item['unit_price'] ), 'Y' );
 
 		}
+
+		$this->log_debug( __METHOD__ . '(): $submission_data line_items => ' . print_r( $submission_data['line_items'], 1 ) );
 
 		return $transaction;
 
@@ -836,8 +898,12 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 	public function process_capture( $authorization, $feed, $submission_data, $form, $entry ) {
 
-		// HOOK for backwards compatibility
-		do_action( 'gform_authorizenet_post_capture', $authorization['is_authorized'], $authorization['captured_payment']['amount'], $entry, $form, $authorization['config'], $authorization['aim_response'] );
+		/**
+		 * HOOK for backwards compatibility.
+		 *
+		 * @deprecated
+		 */
+		do_action( 'gform_authorizenet_post_capture', rgar( $authorization, 'is_authorized' ), rgars( $authorization, 'captured_payment/amount' ), $entry, $form, $this->_args_for_deprecated_hooks['config'], $this->_args_for_deprecated_hooks['aim_response'] );
 
 		return parent::process_capture( $authorization, $feed, $submission_data, $form, $entry );
 	}
@@ -858,7 +924,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			$transaction         = $this->get_payment_transaction( $feed, $submission_data, $form, $entry );
 			$transaction->amount = $fee_amount;
 
-			$transaction = apply_filters( 'gform_authorizenet_transaction_pre_capture_setup_fee', $transaction, $form_data, $config, $form );
+			$transaction = apply_filters( 'gform_authorizenet_transaction_pre_capture_setup_fee', $transaction, $form_data, $config, $form, $entry );
 
 			//Capturing setup fee payment
 			$response = $transaction->authorizeAndCapture();
@@ -868,9 +934,9 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 			if ( $setup_fee_result ) {
 				$captured_payment       = array(
-					'is_success'     => true,
-					'transaction_id' => $response->transaction_id,
-					'amount'         => $response->amount
+						'is_success'     => true,
+						'transaction_id' => $response->transaction_id,
+						'amount'         => $response->amount
 				);
 				$setup_payment_captured = true;
 			}
@@ -880,7 +946,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			//Create subscription.
 			$subscription = $this->get_subscription( $feed, $submission_data, $entry['id'] );
 
-			$subscription = apply_filters( 'gform_authorizenet_subscription_pre_create', $subscription, $form_data, $config, $form );
+			$subscription = apply_filters( 'gform_authorizenet_subscription_pre_create', $subscription, $form_data, $config, $form, $entry );
 
 			//deprecated
 			$subscription = apply_filters( 'gform_authorizenet_before_start_subscription', $subscription, $form_data, $config, $form );
@@ -896,28 +962,22 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				$subscription_id = $arb_response->getSubscriptionId();
 				$this->log_debug( __METHOD__ . "(): Subscription created successfully. Subscription Id: {$subscription_id}" );
 
+				$subscription_result = array(
+					'is_success'                => true,
+					'subscription_id'           => $subscription_id,
+					'amount'                    => $subscription->amount,
+					'subscription_trial_amount' => $subscription->trialAmount,
+				);
+
 				if ( $setup_payment_captured ) {
-					$subscription_result = array(
-						'is_success'                => true,
-						'subscription_id'           => $subscription_id,
-						'captured_payment'          => $captured_payment,
-						'amount'                    => $subscription->amount,
-						'subscription_trial_amount' => $subscription->trialAmount,
-						'arb_subscription'          => $subscription,
-						'arb_response'              => $arb_response,
-						'config'                    => $config
-					);
-				} else {
-					$subscription_result = array(
-						'is_success'                => true,
-						'subscription_id'           => $subscription_id,
-						'amount'                    => $subscription->amount,
-						'subscription_trial_amount' => $subscription->trialAmount,
-						'arb_subscription'          => $subscription,
-						'arb_response'              => $arb_response,
-						'config'                    => $config
-					);
+					$subscription_result['captured_payment'] = $captured_payment;
 				}
+
+				$this->_args_for_deprecated_hooks = array(
+					'arb_subscription' => $subscription,
+					'arb_response'     => $arb_response,
+					'config'           => $config,
+				);
 
 			} else {
 
@@ -958,6 +1018,9 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$this->include_api();
 		$subscription = new AuthorizeNet_Subscription;
 
+		$feed_name = rgar( $feed['meta'], 'feedName' );
+		$this->log_debug( __METHOD__ . "(): Initializing new AuthorizeNet_Subscription object based on feed #{$feed['id']} - {$feed_name}." );
+
 		//getting trial information
 		$trial_info = $this->get_trial_info( $feed, $submission_data );
 
@@ -977,9 +1040,14 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 		$subscription->intervalLength = $feed['meta']['billingCycle_length'];
 		$subscription->intervalUnit   = $feed['meta']['billingCycle_unit'] == 'day' ? 'days' : 'months';
+
 		//setting the time zone to Mountain Time since the validation checks against Authorize.net's local server date, which is Mountain Time.
+		$timezone = date_default_timezone_get();
 		date_default_timezone_set( 'US/Mountain' );
 		$subscription->startDate                = gmdate( 'Y-m-d' );
+		//restoring timezone so logging statements are correct.
+		date_default_timezone_set( $timezone );
+
 		$subscription->totalOccurrences         = $total_occurrences;
 		$subscription->amount                   = $submission_data['payment_amount'];
 		$subscription->creditCardCardNumber     = $submission_data['card_number'];
@@ -992,14 +1060,15 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$subscription->billToFirstName = $billToFirstName;
 		$subscription->billToLastName  = $billToLastName;
 
-		$subscription->customerEmail      = $submission_data['email'];
-		$subscription->billToAddress      = $submission_data['address'];
-		$subscription->billToCity         = $submission_data['city'];
-		$subscription->billToState        = $submission_data['state'];
-		$subscription->billToZip          = $submission_data['zip'];
-		$subscription->billToCountry      = $submission_data['country'];
-		$subscription->orderInvoiceNumber = $invoice_number;
-		$subscription->orderDescription   = $submission_data['form_title'];
+		$subscription->customerEmail       = $submission_data['email'];
+		$subscription->billToAddress       = $submission_data['address'];
+		$subscription->billToCity          = $submission_data['city'];
+		$subscription->billToState         = $submission_data['state'];
+		$subscription->billToZip           = $submission_data['zip'];
+		$subscription->billToCountry       = $submission_data['country'];
+		$subscription->orderInvoiceNumber  = $invoice_number;
+		$subscription->orderDescription    = esc_html( $submission_data['form_title'] );
+		$subscription->customerPhoneNumber = $submission_data['phone'];
 
 		return $subscription;
 	}
@@ -1035,9 +1104,13 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		gform_update_meta( $entry['id'], 'subscription_regular_amount', $authorization['subscription']['amount'] );
 		gform_update_meta( $entry['id'], 'subscription_trial_amount', $authorization['subscription']['subscription_trial_amount'] );
 
-		// HOOKS for backwards compatibility
-		do_action( 'gform_authorizenet_post_create_subscription', $authorization['subscription']['is_success'], $authorization['subscription']['arb_subscription'], $authorization['subscription']['arb_response'], $entry, $form, $authorization['subscription']['config'] );
-		do_action( 'gform_authorizenet_after_subscription_created', $authorization['subscription']['subscription_id'], $authorization['subscription']['amount'], $authorization['subscription']['captured_payment']['amount'] );
+		/**
+		 * HOOKS for backwards compatibility.
+		 *
+		 * @deprecated
+		 */
+		do_action( 'gform_authorizenet_post_create_subscription', $authorization['subscription']['is_success'], $this->_args_for_deprecated_hooks['arb_subscription'], $this->_args_for_deprecated_hooks['arb_response'], $entry, $form, $authorization['subscription']['config'] );
+		do_action( 'gform_authorizenet_after_subscription_created', $authorization['subscription']['subscription_id'], $authorization['subscription']['amount'], rgars( $authorization, 'subscription/captured_payment/amount' ) );
 
 		return parent::process_subscription( $authorization, $feed, $submission_data, $form, $entry );
 	}
@@ -1051,7 +1124,18 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		// cancel the subscription
 		$cancellation    = $this->get_arb();
 		$cancel_response = $cancellation->cancelSubscription( $entry['transaction_id'] );
+
+		$this->log_debug( __METHOD__ . '(): Response to subscription cancellation request => ' . print_r( $cancel_response, 1 ) );
+
 		if ( $cancel_response->isOk() ) {
+			
+			/**
+			 * Fires after a subscription is canceled in Gravity Forms
+			 *
+			 * @param array $entry The Entry Object to filter through
+			 * @param array $feed The Feed object to filter through
+			 * @param int $entry['transaction_id'] Get the transaction ID to filter from the entry object
+			 */
 			do_action( 'gform_subscription_canceled', $entry, $feed, $entry['transaction_id'], 'authorize.net' );
 
 			return true;
@@ -1059,6 +1143,24 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 		return false;
 
+	}
+
+	/**
+	 * Check if the current entry was processed by this add-on.
+	 *
+	 * @param int $entry_id The ID of the current Entry.
+	 *
+	 * @return bool
+	 */
+	public function is_payment_gateway( $entry_id ) {
+
+		if ( $this->is_payment_gateway ) {
+			return true;
+		}
+
+		$gateway = gform_get_meta( $entry_id, 'payment_gateway' );
+
+		return in_array( $gateway, array( 'authorize.net', $this->_slug ) );
 	}
 
 	// Check subscription status; Active subscriptions will be checked to see if their status needs to be updated
@@ -1102,7 +1204,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 				foreach ( $results as $result ) {
 
-					$this->log_debug( __METHOD__ . '(): Lead with late payment => ' . print_r( $result ) );
+					$this->log_debug( __METHOD__ . '(): Lead with late payment => ' . print_r( $result, 1 ) );
 
 					//Getting entry
 					$entry_id = $result->id;
@@ -1135,7 +1237,11 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 							gform_update_meta( $entry_id, 'subscription_payment_count', $payment_count + 1 );
 							gform_update_meta( $entry_id, 'subscription_payment_date', $new_payment_date );
 
-							$action = array( 'amount' => $new_payment_amount, 'subscription_id' => $subscription_id );
+							$action = array(
+								'amount'          => $new_payment_amount,
+								'subscription_id' => $subscription_id,
+								'type'            => 'add_subscription_payment'
+							);
 							$this->add_subscription_payment( $entry, $action );
 
 							//deprecated
@@ -1146,7 +1252,10 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 						case 'expired' :
 
-							$action = array( 'subscription_id' => $subscription_id );
+							$action = array(
+								'subscription_id' => $subscription_id,
+								'type'            => 'expire_subscription'
+							);
 							$this->expire_subscription( $entry, $action );
 
 							//deprecated
@@ -1158,7 +1267,11 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 						case 'suspended':
 
 							$note   = sprintf( __( 'Subscription is currently suspended due to a transaction decline, rejection, or error. Suspended subscriptions must be reactivated before the next scheduled transaction or the subscription will be terminated by the payment gateway. Subscription Id: %s', 'gravityforms' ), $subscription_id );
-							$action = array( 'note' => $note, 'subscription_id' => $subscription_id );
+							$action = array(
+								'note'            => $note,
+								'subscription_id' => $subscription_id,
+								'type'            => 'fail_subscription_payment'
+							);
 							$this->fail_subscription_payment( $entry, $action );
 
 							//deprecated
@@ -1172,14 +1285,19 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 							$this->cancel_subscription( $entry, $feed );
 
-							//deprecated
+						/**
+						 * @deprecated
+						 */
 							do_action( 'gform_authorizenet_post_cancel_subscription', $subscription_id, $entry );
 							do_action( 'gform_authorizenet_subscription_canceled', $entry, $subscription_id, $transaction_id, $new_payment_amount );
 
 							break;
 
 						default:
-							$action = array( 'subscription_id' => $subscription_id );
+							$action = array(
+								'subscription_id' => $subscription_id,
+								'type'            => 'fail_subscription_payment'
+							);
 							$this->fail_subscription_payment( $entry, $action );
 
 							//deprecated
@@ -1205,16 +1323,16 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				case '3' :
 				case '4' :
 				case '41' :
-					$message = __( 'This credit card has been declined by your bank. Please use another form of payment.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'This credit card has been declined by your bank. Please use another form of payment.', 'gravityformsauthorizenet' );
 					break;
 
 				case '8' :
-					$message = __( 'The credit card has expired.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'The credit card has expired.', 'gravityformsauthorizenet' );
 					break;
 
 				case '17' :
 				case '28' :
-					$message = __( 'The merchant does not accept this type of credit card.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'The merchant does not accept this type of credit card.', 'gravityformsauthorizenet' );
 					break;
 
 				case '7' :
@@ -1228,24 +1346,24 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				case '200' :
 				case '201' :
 				case '202' :
-					$message = __( 'There was an error processing your credit card. Please verify the information and try again.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'There was an error processing your credit card. Please verify the information and try again.', 'gravityformsauthorizenet' );
 					break;
 
 				default :
-					$message = __( 'There was an error processing your credit card. Please verify the information and try again.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'There was an error processing your credit card. Please verify the information and try again.', 'gravityformsauthorizenet' );
 
 			}
 		} else {
 			$code = $response->getMessageCode();
 			switch ( $code ) {
 				case 'E00012' :
-					$message = __( 'A duplicate subscription already exists.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'A duplicate subscription already exists.', 'gravityformsauthorizenet' );
 					break;
 				case 'E00018' :
-					$message = __( 'The credit card expires before the subscription start date. Please use another form of payment.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'The credit card expires before the subscription start date. Please use another form of payment.', 'gravityformsauthorizenet' );
 					break;
 				default :
-					$message = __( 'There was an error processing your credit card. Please verify the information and try again.', 'gravityformsauthorizenet' );
+					$message = esc_html__( 'There was an error processing your credit card. Please verify the information and try again.', 'gravityformsauthorizenet' );
 			}
 		}
 
@@ -1302,6 +1420,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$form_data['state']      = $submission_data['state'];
 		$form_data['zip']        = $submission_data['zip'];
 		$form_data['country']    = $submission_data['country'];
+		$form_data['phone']      = $submission_data['phone'];
 
 		$form_data['card_number']     = $submission_data['card_number'];
 		$form_data['expiration_date'] = $submission_data['card_expiration_date'];
