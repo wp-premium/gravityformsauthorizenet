@@ -1,4 +1,26 @@
 -----------------------------------------------------------------------------
+Version 2.2
+    - Added logging of response to subscription cancellation request.
+    - Added support for sending notifications on payment/subscription events. Configured on the edit notification page using the 'Event' setting.
+    - Added phone to the billing information fields available for mapping on the feed.
+    - Added Spanish translation (es_ES).
+    - Added logging of api key validation failure.
+    - Updated the gform_authorizenet_transaction_pre_capture, gform_authorizenet_amount_pre_authorize, gform_authorizenet_transaction_pre_capture_setup_fee and gform_authorizenet_subscription_pre_create filters to include the $entry as an available parameter.
+    - Updated to only add notification events if the form has a relevant feed.
+    - Updated minimum Gravity Forms version to 1.9.12.
+    - Updated to use can_create_feed() to determine if feeds can be created/edited.
+    - Fixed an issue creating the subscription if the form title being assigned to the order description contains special characters.
+    - Fixed an issue with the timestamp for logging statements recorded after the subscription startDate is set.
+    - Fixed PHP notice related to the parameters of the gform_authorizenet_post_capture hook.
+    - Fixed PHP notice which could occur if an authorize and capture transaction failed.
+    - Fixed an issue with check_status() not passing the $action['type'] for use with the related hooks in the framework.
+    - Fixed an issue with a logging statement.
+    - Fixed an issue with the display of the payment details panel on the entry detail page for entries processed by the pre-framework version.
+    - Fixed php notices related to the 'gform_authorizenet_post_capture' hook when running an auth only transaction.
+    - Fixed an issue with the phone field.
+    - Removed potentially sensitive data from logging statements.
+
+-----------------------------------------------------------------------------
 Version 2.1
     - Updated logging statements.
     - Fixed PHP notice when form returns with a validation error.
