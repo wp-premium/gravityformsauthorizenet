@@ -48,6 +48,11 @@ class AuthorizeNetCP extends AuthorizeNetAIM
      * 10 = Virtual Terminal
      */
     
+	/**
+     * Only used if merchant wants to send custom fields.
+     */
+    private $_custom_fields = array();
+	
     /**
      * Strip sentinels and set track1 field.
      *
@@ -174,10 +179,10 @@ class AuthorizeNetCP_Response extends AuthorizeNetResponse
                 $this->user_ref             = $this->_response_array[9];
                 $this->card_num             = $this->_response_array[20];
                 $this->card_type            = $this->_response_array[21];
-                $this->split_tender_id      = $this->_response_array[22];
-                $this->requested_amount     = $this->_response_array[23];
-                $this->approved_amount      = $this->_response_array[24];
-                $this->card_balance         = $this->_response_array[25];
+                $this->split_tender_id      = isset($this->_response_array[22]) ? $this->_response_array[22] : NULL;
+                $this->requested_amount     = isset($this->_response_array[23]) ? $this->_response_array[23] : NULL;
+                $this->approved_amount      = isset($this->_response_array[24]) ? $this->_response_array[24] : NULL;
+                $this->card_balance         = isset($this->_response_array[25]) ? $this->_response_array[25] : NULL;
     
     
                 

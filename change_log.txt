@@ -1,4 +1,20 @@
 -----------------------------------------------------------------------------
+Version 2.3
+    - Added logging statements.
+    - Updated Authorize.net API library.
+    - Fixed an issue with check_status() not connecting to the correct Authorize.net account when local api settings differed from main api settings.
+    - Fixed an issue with cancel_subscription() not connecting to the correct Authorize.net account when local api settings differed from main api settings.
+    - Fixed an issue with the subscription start date not showing the correct date in the entry detail page when the subscription start date is set for a day different than the current day.
+
+-----------------------------------------------------------------------------
+Version 2.2.2
+    - Fixed an issue with the subscription object billToAddress property.
+
+-----------------------------------------------------------------------------
+Version 2.2.1
+    - Added support for the line item taxable status being set using the gform_submission_data_pre_process_payment filter e.g. $line_item['taxable'] = 'N'.
+
+-----------------------------------------------------------------------------
 Version 2.2
     - Added logging of response to subscription cancellation request.
     - Added support for sending notifications on payment/subscription events. Configured on the edit notification page using the 'Event' setting.
