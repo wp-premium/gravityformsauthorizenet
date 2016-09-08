@@ -17,7 +17,7 @@
 class AuthorizeNetTD extends AuthorizeNetRequest
 {
 
-    const LIVE_URL = "https://api.authorize.net/xml/v1/request.api";
+    const LIVE_URL = "https://api2.authorize.net/xml/v1/request.api";
     const SANDBOX_URL = "https://apitest.authorize.net/xml/v1/request.api";
     
     private $_xml;
@@ -122,6 +122,32 @@ class AuthorizeNetTD extends AuthorizeNetRequest
     {
         $this->_constructXml("getTransactionDetailsRequest");
         $this->_xml->addChild("transId", $transId);
+        return $this->_sendRequest();
+    }
+    
+    /**
+     * This function returns statistics about the settled batch specified by $batchId.
+     *
+     * @param int $batchId
+     *
+     * @return AuthorizeNetTD_Response
+     */
+    public function getBatchStatistics($batchId)
+    {
+        $this->_constructXml("getBatchStatisticsRequest");
+        $this->_xml->addChild("batchId", $batchId);
+        return $this->_sendRequest();
+    }
+    
+    /**
+     * This function returns the last 1000 unsettled transactions.
+     *
+     *
+     * @return AuthorizeNetTD_Response
+     */
+    public function getUnsettledTransactionList()
+    {
+        $this->_constructXml("getUnsettledTransactionListRequest");
         return $this->_sendRequest();
     }
     

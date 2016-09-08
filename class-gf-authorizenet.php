@@ -289,6 +289,24 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		}
 	}
 
+	// function needed for cancel subscription and check_status where $this->current_feed is not available
+	private function get_local_api_settings( $feed ) {
+
+		if($feed['meta']['apiSettingsEnabled'])
+		{
+			$local_api_settings = array(
+				'login_id'        => rgar( $feed['meta'], 'overrideLogin' ),
+				'transaction_key' => rgar( $feed['meta'], 'overrideKey' ),
+				'mode'            => rgar( $feed['meta'], 'overrideMode' ));
+
+		}else{
+			$local_api_settings = array();
+		}
+
+		return $local_api_settings;
+
+	}
+
 	private function get_api_settings( $local_api_settings ) {
 
 		//for authorize.net, each feed can have its own login id and transaction key specified which overrides the master plugin one
@@ -319,10 +337,11 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 	private function get_arb( $local_api_settings = array() ) {
 
 		if ( ! empty( $local_api_settings ) ) {
+			$this->log_debug( __METHOD__ . '(): Local API settings enabled.');
 			$api_settings = array(
-				'login_id'        => rgar( $local_api_settings, 'overrideLogin' ),
-				'transaction_key' => rgar( $local_api_settings, 'overrideKey' ),
-				'mode'            => rgar( $local_api_settings, 'overrideMode' )
+				'login_id'        => rgar( $local_api_settings, 'login_id' ),
+				'transaction_key' => rgar( $local_api_settings, 'transaction_key' ),
+				'mode'            => rgar( $local_api_settings, 'mode' )
 			);
 		} else {
 			$api_settings = $this->get_api_settings( $local_api_settings );
@@ -886,7 +905,8 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$transaction->phone            = $submission_data['phone'];
 
 		foreach ( $submission_data['line_items'] as $line_item ) {
-			$transaction->addLineItem( $line_item['id'], $this->remove_spaces( $this->truncate( $line_item['name'], 31 ) ), $this->truncate( $line_item['description'], 255 ), $line_item['quantity'], GFCommon::to_number( $line_item['unit_price'] ), 'Y' );
+			$taxable = rgempty( 'taxable', $line_item ) ? 'Y' : $line_item['taxable'];
+			$transaction->addLineItem( $line_item['id'], $this->remove_spaces( $this->truncate( $line_item['name'], 31 ) ), $this->truncate( $line_item['description'], 255 ), $line_item['quantity'], GFCommon::to_number( $line_item['unit_price'] ), $taxable );
 
 		}
 
@@ -967,6 +987,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 					'subscription_id'           => $subscription_id,
 					'amount'                    => $subscription->amount,
 					'subscription_trial_amount' => $subscription->trialAmount,
+					'subscription_start_date' => $subscription->startDate,
 				);
 
 				if ( $setup_payment_captured ) {
@@ -996,7 +1017,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				// needed for filter backwards compatibility (gform_authorizenet_validation_message)
 				$error_message     = $this->get_error_message( $_POST, $arb_response, 'arb' );
 				$validation_result = $this->get_valiation_result( $form, $error_message );
-				$error_message     = apply_filters( 'gform_authorizenet_validation_message', $error_message, $validation_result, $_POST, $response, 'arb' );
+				$error_message     = apply_filters( 'gform_authorizenet_validation_message', $error_message, $validation_result, $_POST, $arb_response, 'arb' );
 
 				$this->log_debug( __METHOD__ . '(): There was an error creating Subscription.' . $void_text );
 				$subscription_result = array( 'is_success' => false, 'error_message' => $error_message );
@@ -1044,7 +1065,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		//setting the time zone to Mountain Time since the validation checks against Authorize.net's local server date, which is Mountain Time.
 		$timezone = date_default_timezone_get();
 		date_default_timezone_set( 'US/Mountain' );
-		$subscription->startDate                = gmdate( 'Y-m-d' );
+		$subscription->startDate = gmdate( 'Y-m-d' );
 		//restoring timezone so logging statements are correct.
 		date_default_timezone_set( $timezone );
 
@@ -1061,7 +1082,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$subscription->billToLastName  = $billToLastName;
 
 		$subscription->customerEmail       = $submission_data['email'];
-		$subscription->billToAddress       = $submission_data['address'];
+		$subscription->billToAddress       = trim( $submission_data['address'] . ' ' . $submission_data['address2'] );
 		$subscription->billToCity          = $submission_data['city'];
 		$subscription->billToState         = $submission_data['state'];
 		$subscription->billToZip           = $submission_data['zip'];
@@ -1099,7 +1120,9 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 	public function process_subscription( $authorization, $feed, $submission_data, $form, $entry ) {
 
-		gform_update_meta( $entry['id'], 'subscription_payment_date', gmdate( 'Y-m-d H:i:s' ) );
+		//gform_update_meta( $entry['id'], 'subscription_payment_date', gmdate( 'Y-m-d H:i:s' ) );
+
+		gform_update_meta( $entry['id'], 'subscription_payment_date', $authorization['subscription']['subscription_start_date']);
 		gform_update_meta( $entry['id'], 'subscription_payment_count', '1' );
 		gform_update_meta( $entry['id'], 'subscription_regular_amount', $authorization['subscription']['amount'] );
 		gform_update_meta( $entry['id'], 'subscription_trial_amount', $authorization['subscription']['subscription_trial_amount'] );
@@ -1109,7 +1132,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		 *
 		 * @deprecated
 		 */
-		do_action( 'gform_authorizenet_post_create_subscription', $authorization['subscription']['is_success'], $this->_args_for_deprecated_hooks['arb_subscription'], $this->_args_for_deprecated_hooks['arb_response'], $entry, $form, $authorization['subscription']['config'] );
+		do_action( 'gform_authorizenet_post_create_subscription', $authorization['subscription']['is_success'], $this->_args_for_deprecated_hooks['arb_subscription'], $this->_args_for_deprecated_hooks['arb_response'], $entry, $form, rgars($authorization, 'subscription/config') );
 		do_action( 'gform_authorizenet_after_subscription_created', $authorization['subscription']['subscription_id'], $authorization['subscription']['amount'], rgars( $authorization, 'subscription/captured_payment/amount' ) );
 
 		return parent::process_subscription( $authorization, $feed, $submission_data, $form, $entry );
@@ -1122,7 +1145,8 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$this->include_api();
 
 		// cancel the subscription
-		$cancellation    = $this->get_arb();
+		$local_api_settings =  $this->get_local_api_settings( $feed );
+		$cancellation    = $this->get_arb($local_api_settings);
 		$cancel_response = $cancellation->cancelSubscription( $entry['transaction_id'] );
 
 		$this->log_debug( __METHOD__ . '(): Response to subscription cancellation request => ' . print_r( $cancel_response, 1 ) );
@@ -1212,10 +1236,14 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 					//Getting subscription status from authorize.net
 					$subscription_id = $result->transaction_id;
-					$status_request  = $this->get_arb();
+					$local_api_settings = $this->get_local_api_settings($feed);
+					$status_request  = $this->get_arb($local_api_settings);
+					//$status_request  = $this->get_arb();
 					$status_response = $status_request->getSubscriptionStatus( $subscription_id );
+					$this->log_debug( __METHOD__ . '(): Subscription status response => ' . print_r($status_response,1));
 					$status          = $status_response->getSubscriptionStatus();
 
+					$this->log_debug( __METHOD__ . '(): Subscription (' . $subscription_id  .') status => ' . $status);
 					switch ( strtolower( $status ) ) {
 						case 'active' :
 							// getting feed trial information
