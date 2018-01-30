@@ -1,13 +1,13 @@
-# Copyright 2009-2016 Rocketgenius, Inc.
+# Copyright 2009-2018 Rocketgenius, Inc.
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms Authorize.Net Add-On 2.3\n"
+"Project-Id-Version: Gravity Forms Authorize.Net Add-On 2.4\n"
 "Report-Msgid-Bugs-To: http://www.gravtiyhelp.com\n"
-"POT-Creation-Date: 2016-09-06 19:12:14+00:00\n"
+"POT-Creation-Date: 2018-01-29 19:43:05+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Rocketgenius <customerservice@rocketgenius.com>\n"
 "Language-Team: Rocketgenius <customerservice@rocketgenius.com>\n"
 "X-Generator: Gravity Forms Build Server\n"
@@ -53,38 +53,38 @@ msgstr ""
 msgid "Please wait..."
 msgstr ""
 
-#: class-gf-authorizenet.php:133
+#: class-gf-authorizenet.php:134
 msgid ""
 "Authorize.Net is a payment gateway for merchants. Use Gravity Forms to "
 "collect payment information and automatically integrate to your "
-"Authorize.Net account. If you don't have a Authorize.Net account, you can "
-"%ssign up for one here%s"
+"Authorize.Net account. If you don't have an Authorize.Net account, you can "
+"%ssign up for one here.%s"
 msgstr ""
 
-#: class-gf-authorizenet.php:137
+#: class-gf-authorizenet.php:138
 msgid "Authorize.Net Account Information"
 msgstr ""
 
-#: class-gf-authorizenet.php:142 class-gf-authorizenet.php:438
-#: class-gf-authorizenet.php:442
+#: class-gf-authorizenet.php:143 class-gf-authorizenet.php:458
+#: class-gf-authorizenet.php:462
 msgid "Mode"
 msgstr ""
 
-#: class-gf-authorizenet.php:147 class-gf-authorizenet.php:445
+#: class-gf-authorizenet.php:148 class-gf-authorizenet.php:465
 msgid "Production"
 msgstr ""
 
-#: class-gf-authorizenet.php:151 class-gf-authorizenet.php:449
+#: class-gf-authorizenet.php:152 class-gf-authorizenet.php:469
 msgid "Test"
 msgstr ""
 
-#: class-gf-authorizenet.php:159 class-gf-authorizenet.php:457
-#: class-gf-authorizenet.php:461
+#: class-gf-authorizenet.php:160 class-gf-authorizenet.php:477
+#: class-gf-authorizenet.php:481
 msgid "API Login ID"
 msgstr ""
 
-#: class-gf-authorizenet.php:167 class-gf-authorizenet.php:466
-#: class-gf-authorizenet.php:470
+#: class-gf-authorizenet.php:167 class-gf-authorizenet.php:486
+#: class-gf-authorizenet.php:490
 msgid "Transaction Key"
 msgstr ""
 
@@ -92,22 +92,43 @@ msgstr ""
 msgid "Automated Recurring Billing Setup"
 msgstr ""
 
-#: class-gf-authorizenet.php:183
-msgid "ARB is setup in my Authorize.Net account."
+#: class-gf-authorizenet.php:190
+msgid "ARB is set up in my Authorize.Net account."
 msgstr ""
 
-#: class-gf-authorizenet.php:191
+#: class-gf-authorizenet.php:200
+msgid "Automatic Retry"
+msgstr ""
+
+#: class-gf-authorizenet.php:200
+msgid ""
+"Automatic Retry enhances Recurring Billing so you do not need to manually "
+"collect failed payments. With Automatic Retry, your customer's "
+"subscriptions will not terminate due to payment failures and will remain in "
+"a suspended status until you update the subscription's payment details. "
+"Once updated, the subscription will automatically retry the failed payment "
+"in the subscription."
+msgstr ""
+
+#: class-gf-authorizenet.php:203
+msgid ""
+"Automatic Retry is turned on in my Authorize.Net account. To enable this "
+"feature in your Authorize.Net account, go to the Recurring Billing page "
+"under Tools and click on \"Enable Automatic Retry\" under Settings."
+msgstr ""
+
+#: class-gf-authorizenet.php:211
 msgid "Settings updated successfully"
 msgstr ""
 
-#: class-gf-authorizenet.php:202
+#: class-gf-authorizenet.php:222
 msgid ""
 "You can find your unique %sAPI Login ID%s by clicking on the 'Account' link "
 "at the Authorize.Net Merchant Interface. Then click 'API Login ID and "
 "Transaction Key'. Your API Login ID will be displayed."
 msgstr ""
 
-#: class-gf-authorizenet.php:216
+#: class-gf-authorizenet.php:236
 msgid ""
 "You can find your unique %sTransaction Key%s by clicking on the 'Account' "
 "link at the Authorize.Net Merchant Interface. Then click 'API Login ID and "
@@ -115,105 +136,109 @@ msgid ""
 "Key, but you will be able to generate a new one."
 msgstr ""
 
-#: class-gf-authorizenet.php:381 class-gf-authorizenet.php:383
+#: class-gf-authorizenet.php:401 class-gf-authorizenet.php:403
 msgid "Options"
 msgstr ""
 
-#: class-gf-authorizenet.php:383
+#: class-gf-authorizenet.php:403
 msgid "Turn on or off the available Authorize.Net checkout options."
 msgstr ""
 
-#: class-gf-authorizenet.php:393 class-gf-authorizenet.php:395
+#: class-gf-authorizenet.php:413 class-gf-authorizenet.php:415
 msgid "Posts"
 msgstr ""
 
-#: class-gf-authorizenet.php:395
+#: class-gf-authorizenet.php:415
 msgid ""
 "Enable this option if you would like to change the post status when a "
 "subscription is canceled."
 msgstr ""
 
-#: class-gf-authorizenet.php:398
+#: class-gf-authorizenet.php:418
 msgid "Change post status when subscription is canceled."
 msgstr ""
 
-#: class-gf-authorizenet.php:414 class-gf-authorizenet.php:416
+#: class-gf-authorizenet.php:434 class-gf-authorizenet.php:436
 msgid "API Settings"
 msgstr ""
 
-#: class-gf-authorizenet.php:416
+#: class-gf-authorizenet.php:436
 msgid ""
 "Override the settings provided on the Authorize.Net Settings page and use "
 "these instead for this feed."
 msgstr ""
 
-#: class-gf-authorizenet.php:442
+#: class-gf-authorizenet.php:451
+msgid "Override Default Settings"
+msgstr ""
+
+#: class-gf-authorizenet.php:462
 msgid ""
 "Select either Production or Test mode to override the chosen mode on the "
 "Authorize.Net Settings page."
 msgstr ""
 
-#: class-gf-authorizenet.php:461
+#: class-gf-authorizenet.php:481
 msgid ""
 "Enter a new value to override the API Login ID on the Authorize.Net "
 "Settings page."
 msgstr ""
 
-#: class-gf-authorizenet.php:470
+#: class-gf-authorizenet.php:490
 msgid ""
 "Enter a new value to override the Transaction Key on the Authorize.Net "
 "Settings page."
 msgstr ""
 
-#: class-gf-authorizenet.php:486
+#: class-gf-authorizenet.php:506
 msgid "Send Authorize.Net email receipt."
 msgstr ""
 
-#: class-gf-authorizenet.php:508
+#: class-gf-authorizenet.php:528
 msgid "Mark Post as Draft"
 msgstr ""
 
-#: class-gf-authorizenet.php:509
+#: class-gf-authorizenet.php:529
 msgid "Delete Post"
 msgstr ""
 
-#: class-gf-authorizenet.php:522
+#: class-gf-authorizenet.php:542
 msgid "day(s)"
 msgstr ""
 
-#: class-gf-authorizenet.php:523
+#: class-gf-authorizenet.php:543
 msgid "month(s)"
 msgstr ""
 
-#: class-gf-authorizenet.php:540
+#: class-gf-authorizenet.php:560
 msgid "Phone"
 msgstr ""
 
-#: class-gf-authorizenet.php:560
+#: class-gf-authorizenet.php:580
 msgid "Payment Completed"
 msgstr ""
 
-#: class-gf-authorizenet.php:561
+#: class-gf-authorizenet.php:581
 msgid "Subscription Created"
 msgstr ""
 
-#: class-gf-authorizenet.php:562
+#: class-gf-authorizenet.php:582
 msgid "Subscription Canceled"
 msgstr ""
 
-#: class-gf-authorizenet.php:563
+#: class-gf-authorizenet.php:583
 msgid "Subscription Expired"
 msgstr ""
 
-#: class-gf-authorizenet.php:564
+#: class-gf-authorizenet.php:584
 msgid "Subscription Payment Added"
 msgstr ""
 
-#: class-gf-authorizenet.php:565
+#: class-gf-authorizenet.php:585
 msgid "Subscription Payment Failed"
 msgstr ""
 
-#: class-gf-authorizenet.php:1297
+#: class-gf-authorizenet.php:1325
 msgid ""
 "Subscription is currently suspended due to a transaction decline, "
 "rejection, or error. Suspended subscriptions must be reactivated before the "
@@ -221,32 +246,42 @@ msgid ""
 "payment gateway. Subscription Id: %s"
 msgstr ""
 
-#: class-gf-authorizenet.php:1354
+#: class-gf-authorizenet.php:1382
 msgid ""
 "This credit card has been declined by your bank. Please use another form of "
 "payment."
 msgstr ""
 
-#: class-gf-authorizenet.php:1358
+#: class-gf-authorizenet.php:1386
 msgid "The credit card has expired."
 msgstr ""
 
-#: class-gf-authorizenet.php:1363
+#: class-gf-authorizenet.php:1391
 msgid "The merchant does not accept this type of credit card."
 msgstr ""
 
-#: class-gf-authorizenet.php:1377 class-gf-authorizenet.php:1381
-#: class-gf-authorizenet.php:1394
+#: class-gf-authorizenet.php:1395
+msgid ""
+"The address provided does not match the billing address of the cardholder. "
+"Please verify the information and try again."
+msgstr ""
+
+#: class-gf-authorizenet.php:1399
+msgid "The transaction amount is greater than the maximum amount allowed."
+msgstr ""
+
+#: class-gf-authorizenet.php:1412 class-gf-authorizenet.php:1416
+#: class-gf-authorizenet.php:1429
 msgid ""
 "There was an error processing your credit card. Please verify the "
 "information and try again."
 msgstr ""
 
-#: class-gf-authorizenet.php:1388
+#: class-gf-authorizenet.php:1423
 msgid "A duplicate subscription already exists."
 msgstr ""
 
-#: class-gf-authorizenet.php:1391
+#: class-gf-authorizenet.php:1426
 msgid ""
 "The credit card expires before the subscription start date. Please use "
 "another form of payment."
