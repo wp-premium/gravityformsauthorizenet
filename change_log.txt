@@ -1,4 +1,14 @@
 -----------------------------------------------------------------------------
+Version 2.4
+	- Added support for Gravity Forms 2.3.
+	- Added "Automatic Retry is turned on in my Authorize.Net account" checkbox to Settings Page. This feature is required for ARB.
+	- Added additional error messages.
+	- Updated "Override Default Settings" so it can be translated
+	- Fixed an issue with logging a message when the error_message array in the response object was empty.
+    - Fixed strings for translations
+	- Fixed a test description appearing on the add-on settings page with Gravity Forms 2.2+.
+
+-----------------------------------------------------------------------------
 Version 2.3
     - Added logging statements.
     - Updated Authorize.net API library.
