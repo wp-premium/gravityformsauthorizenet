@@ -130,7 +130,8 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 
 	//----- SETTINGS PAGES ----------//
 	public function plugin_settings_fields() {
-		$description = '<p style="text-align: left;">' . sprintf( esc_html__( 'Authorize.Net is a payment gateway for merchants. Use Gravity Forms to collect payment information and automatically integrate to your Authorize.Net account. If you don\'t have a Authorize.Net account, you can %ssign up for one here%s', 'gravityformsauthorizenet' ), '<a href="http://www.authorizenet.com" target="_blank">', '</a>' ) . '</p>';
+
+		$description = '<p style="text-align: left;">' . sprintf( esc_html__( 'Authorize.Net is a payment gateway for merchants. Use Gravity Forms to collect payment information and automatically integrate to your Authorize.Net account. If you don\'t have an Authorize.Net account, you can %ssign up for one here.%s', 'gravityformsauthorizenet' ), '<a href="http://www.authorizenet.com" target="_blank">', '</a>' ) . '</p>';
 
 		return array(
 			array(
@@ -160,7 +161,6 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 						'type'              => 'api_login',
 						'class'             => 'medium',
 						'feedback_callback' => array( $this, 'is_valid_plugin_key' ),
-						'description'       => 'testing',
 					),
 					array(
 						'name'              => 'transactionKey',
@@ -178,10 +178,30 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 						'name'    => 'arb',
 						'label'   => 'ARB',
 						'type'    => 'checkbox',
+						'onchange' => "if(jQuery(this).prop('checked')){
+										jQuery('#gaddon-setting-row-automaticRetry').show();
+
+									} else {
+										jQuery('#gaddon-setting-row-automaticRetry').hide();
+
+									}",
 						'choices' => array(
 							array(
-								'label' => esc_html__( 'ARB is setup in my Authorize.Net account.', 'gravityformsauthorizenet' ),
+								'label' => esc_html__( 'ARB is set up in my Authorize.Net account.', 'gravityformsauthorizenet' ),
 								'name'  => 'arb'
+							)
+						),
+					),
+					array(
+						'name'    => 'automaticRetry',
+						'label'   => 'Automatic Retry',
+						'type'    => 'checkbox',
+						'hidden'  => ! $this->get_setting( 'arb' ),
+						'tooltip'       => '<h6>' . esc_html__( 'Automatic Retry', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Automatic Retry enhances Recurring Billing so you do not need to manually collect failed payments. With Automatic Retry, your customer\'s subscriptions will not terminate due to payment failures and will remain in a suspended status until you update the subscription\'s payment details. Once updated, the subscription will automatically retry the failed payment in the subscription.'  , 'gravityformsauthorizenet' ),
+						'choices' => array(
+							array(
+								'label' => esc_html__( 'Automatic Retry is turned on in my Authorize.Net account. To enable this feature in your Authorize.Net account, go to the Recurring Billing page under Tools and click on "Enable Automatic Retry" under Settings.', 'gravityformsauthorizenet' ),
+								'name'  => 'automaticRetry'
 							)
 						),
 					),
@@ -428,7 +448,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 									}",
 				'choices'  => array(
 					array(
-						'label' => 'Override Default Settings',
+						'label' => esc_html__( 'Override Default Settings', 'gravityformsauthorizenet' ),
 						'name'  => 'apiSettingsEnabled',
 					),
 				)
@@ -853,7 +873,10 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				'config'       => $config,
 			);
 		} else {
-			$this->log_error( __METHOD__ . '(): Funds could not be captured. Response => ' . print_r( $response->error_message, true ) );
+			if(!empty($response->error_message))
+				$this->log_error( __METHOD__ . '(): Funds could not be captured (error_message). Response => ' . print_r( $response->error_message, true ) );
+			else
+				$this->log_error( __METHOD__ . '(): Funds could not be captured (response_reason_text). Response => ' . $response->response_reason_text);
 
 			// needed for filter backwards compatibility (gform_authorizenet_validation_message)
 			$error_message     = $this->get_error_message( $_POST, $response, 'aim' );
@@ -1218,9 +1241,14 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				// finding leads with a late payment date
 				global $wpdb;
 
+				// Get entry table names and entry ID column.
+				$entry_table      = self::get_entry_table_name();
+				$entry_meta_table = self::get_entry_meta_table_name();
+				$entry_id_column  = version_compare( self::get_gravityforms_db_version(), '2.3-dev-1', '<' ) ? 'lead_id' : 'entry_id';
+
 				$results = $wpdb->get_results( "SELECT l.id, l.transaction_id, m.meta_value as payment_date
-                                                FROM {$wpdb->prefix}rg_lead l
-                                                INNER JOIN {$wpdb->prefix}rg_lead_meta m ON l.id = m.lead_id
+                                                FROM {$entry_table} l
+                                                INNER JOIN {$entry_meta_table} m ON l.id = m.{$entry_id_column}
                                                 WHERE l.form_id={$form_id}
                                                 AND payment_status = 'Active'
                                                 AND meta_key = 'subscription_payment_date'
@@ -1363,6 +1391,14 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 					$message = esc_html__( 'The merchant does not accept this type of credit card.', 'gravityformsauthorizenet' );
 					break;
 
+				case '27' :
+					$message = esc_html__( 'The address provided does not match the billing address of the cardholder. Please verify the information and try again.', 'gravityformsauthorizenet' );
+					break;
+
+				case '49' :
+					$message = esc_html__( 'The transaction amount is greater than the maximum amount allowed.', 'gravityformsauthorizenet' );
+					break;
+
 				case '7' :
 				case '44' :
 				case '45' :
@@ -1370,7 +1406,6 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 				case '78' :
 				case '6' :
 				case '37' :
-				case '27' :
 				case '200' :
 				case '201' :
 				case '202' :
@@ -1546,6 +1581,58 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$config['meta']['customer_fields']['country']  = rgar( $feed['meta'], 'billingInformation_country' );
 
 		return $config;
+
+	}
+
+	/**
+	 * Get version of Gravity Forms database.
+	 *
+	 * @since  2.4
+	 * @access public
+	 *
+	 * @uses   GFFormsModel::get_database_version()
+	 *
+	 * @return string
+	 */
+	public static function get_gravityforms_db_version() {
+
+		return method_exists( 'GFFormsModel', 'get_database_version' ) ? GFFormsModel::get_database_version() : GFForms::$version;
+
+	}
+
+	/**
+	 * Get name for entry table.
+	 *
+	 * @since  2.4
+	 * @access public
+	 *
+	 * @uses   GFFormsModel::get_entry_table_name()
+	 * @uses   GFFormsModel::get_lead_table_name()
+	 * @uses   GFPayPalPaymentsPro::get_gravityforms_db_version()
+	 *
+	 * @return string
+	 */
+	public static function get_entry_table_name() {
+
+		return version_compare( self::get_gravityforms_db_version(), '2.3-dev-1', '<' ) ? GFFormsModel::get_lead_table_name() : GFFormsModel::get_entry_table_name();
+
+	}
+
+	/**
+	 * Get name for entry meta table.
+	 *
+	 * @since  2.4
+	 * @access public
+	 *
+	 * @uses   GFFormsModel::get_entry_meta_table_name()
+	 * @uses   GFFormsModel::get_lead_meta_table_name()
+	 * @uses   GFPayPalPaymentsPro::get_gravityforms_db_version()
+	 *
+	 * @return string
+	 */
+	public static function get_entry_meta_table_name() {
+
+		return version_compare( self::get_gravityforms_db_version(), '2.3-dev-1', '<' ) ? GFFormsModel::get_lead_meta_table_name() : GFFormsModel::get_entry_meta_table_name();
 
 	}
 
