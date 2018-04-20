@@ -1,6 +1,11 @@
 <?php
 namespace net\authorize\api\controller;
 
+// don't load directly
+if ( ! defined( 'ABSPATH' ) ) {
+    die();
+}
+
 use net\authorize\api\contract\v1\AnetApiRequestType;
 use net\authorize\api\controller\base\ApiOperationBase;
 

@@ -1,4 +1,10 @@
 <?php
+
+// don't load directly
+if ( ! defined( 'ABSPATH' ) ) {
+    die();
+}
+
 /**
  * Easily use the Authorize.Net Server Integration Method(SIM).
  *

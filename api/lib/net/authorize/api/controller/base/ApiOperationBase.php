@@ -1,6 +1,11 @@
 <?php
 namespace net\authorize\api\controller\base;
 
+// don't load directly
+if ( ! defined( 'ABSPATH' ) ) {
+    die();
+}
+
 use InvalidArgumentException;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\handler\HandlerRegistryInterface;

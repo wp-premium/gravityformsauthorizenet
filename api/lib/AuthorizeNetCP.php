@@ -1,4 +1,10 @@
 <?php
+
+// don't load directly
+if ( ! defined( 'ABSPATH' ) ) {
+    die();
+}
+
 /**
  * Easily interact with the Authorize.Net Card Present API.
  *

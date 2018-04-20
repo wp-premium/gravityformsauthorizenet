@@ -1,5 +1,10 @@
 <?php
 
+// don't load directly
+if ( ! defined( 'ABSPATH' ) ) {
+	die();
+}
+
 GFForms::include_payment_addon_framework();
 
 class GFAuthorizeNet extends GFPaymentAddOn {
@@ -989,10 +994,20 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 			//Create subscription.
 			$subscription = $this->get_subscription( $feed, $submission_data, $entry['id'] );
 
-			$subscription = apply_filters( 'gform_authorizenet_subscription_pre_create', $subscription, $form_data, $config, $form, $entry );
+			if ( has_filter( 'gform_authorizenet_subscription_pre_create' ) ) {
+				$this->log_debug( __METHOD__ . '(): Executing functions hooked to gform_authorizenet_subscription_pre_create.' );
+				$subscription = apply_filters( 'gform_authorizenet_subscription_pre_create', $subscription, $form_data, $config, $form, $entry );
+			}
 
 			//deprecated
-			$subscription = apply_filters( 'gform_authorizenet_before_start_subscription', $subscription, $form_data, $config, $form );
+			if ( has_filter( 'gform_authorizenet_before_start_subscription' ) ) {
+				$this->log_debug( __METHOD__ . '(): Executing functions hooked to gform_authorizenet_before_start_subscription.' );
+				$subscription = apply_filters( 'gform_authorizenet_before_start_subscription', $subscription, $form_data, $config, $form );
+			}
+
+			if ( ! $subscription instanceof AuthorizeNet_Subscription ) {
+				return array( 'is_success' => false, 'error_message' => __( 'Unable to create subscription. Subscription object not available.', 'gravityformsauthorizenet' ) );
+			}
 
 			//Send subscription request.
 			$request      = $this->get_arb();
