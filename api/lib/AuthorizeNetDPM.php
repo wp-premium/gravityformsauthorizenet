@@ -1,4 +1,10 @@
 <?php
+
+// don't load directly
+if ( ! defined( 'ABSPATH' ) ) {
+    die();
+}
+
 /**
  * Demonstrates the Direct Post Method.
  *

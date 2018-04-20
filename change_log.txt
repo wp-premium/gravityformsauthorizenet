@@ -1,4 +1,11 @@
 -----------------------------------------------------------------------------
+Version 2.5
+	- Added security enhancements.
+	- Added GPL to plugin header.
+	- Fixed a fatal error which could occur if the subscription object was not returned by the gform_authorizenet_subscription_pre_create or gform_authorizenet_before_start_subscription filters.
+	- Updated Plugin URI and Author URI to use https.
+
+-----------------------------------------------------------------------------
 Version 2.4
 	- Added support for Gravity Forms 2.3.
 	- Added "Automatic Retry is turned on in my Authorize.Net account" checkbox to Settings Page. This feature is required for ARB.
