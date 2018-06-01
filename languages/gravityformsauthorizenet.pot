@@ -1,9 +1,9 @@
 # Copyright 2009-2018 Rocketgenius, Inc.
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms Authorize.Net Add-On 2.5\n"
-"Report-Msgid-Bugs-To: http://www.gravtiyhelp.com\n"
-"POT-Creation-Date: 2018-04-12 16:06:46+00:00\n"
+"Project-Id-Version: Gravity Forms Authorize.Net Add-On 2.6\n"
+"Report-Msgid-Bugs-To: https://www.gravtiyforms.com\n"
+"POT-Creation-Date: 2018-05-24 15:13:19+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -106,8 +106,8 @@ msgid ""
 "collect failed payments. With Automatic Retry, your customer's "
 "subscriptions will not terminate due to payment failures and will remain in "
 "a suspended status until you update the subscription's payment details. "
-"Once updated, the subscription will automatically retry the failed payment "
-"in the subscription."
+"Once updated, Authorize.Net will automatically retry the failed payment in "
+"the subscription."
 msgstr ""
 
 #: class-gf-authorizenet.php:208
