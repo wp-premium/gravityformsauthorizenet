@@ -202,7 +202,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 						'label'   => 'Automatic Retry',
 						'type'    => 'checkbox',
 						'hidden'  => ! $this->get_setting( 'arb' ),
-						'tooltip'       => '<h6>' . esc_html__( 'Automatic Retry', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Automatic Retry enhances Recurring Billing so you do not need to manually collect failed payments. With Automatic Retry, your customer\'s subscriptions will not terminate due to payment failures and will remain in a suspended status until you update the subscription\'s payment details. Once updated, the subscription will automatically retry the failed payment in the subscription.'  , 'gravityformsauthorizenet' ),
+						'tooltip'       => '<h6>' . esc_html__( 'Automatic Retry', 'gravityformsauthorizenet' ) . '</h6>' . esc_html__( 'Automatic Retry enhances Recurring Billing so you do not need to manually collect failed payments. With Automatic Retry, your customer\'s subscriptions will not terminate due to payment failures and will remain in a suspended status until you update the subscription\'s payment details. Once updated, Authorize.Net will automatically retry the failed payment in the subscription.'  , 'gravityformsauthorizenet' ),
 						'choices' => array(
 							array(
 								'label' => esc_html__( 'Automatic Retry is turned on in my Authorize.Net account. To enable this feature in your Authorize.Net account, go to the Recurring Billing page under Tools and click on "Enable Automatic Retry" under Settings.', 'gravityformsauthorizenet' ),
