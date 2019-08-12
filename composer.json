@@ -1,0 +1,9 @@
+{
+    "name": "wp-premium/gravityformsauthorizenet",
+    "type": "wordpress-plugin",
+    "autoload": {
+        "classmap": [
+            "."
+        ]
+    }
+}
