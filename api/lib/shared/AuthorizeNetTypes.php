@@ -233,7 +233,7 @@ class AuthorizeNet_Subscription
     public $shipToState;
     public $shipToZip;
     public $shipToCountry;
-    
+
     public function getXml()
     {
         $xml = "<subscription>
@@ -264,7 +264,7 @@ class AuthorizeNet_Subscription
             <bankName>{$this->bankAccountBankName}</bankName>
         </bankAccount>
     </payment>
-    <order>
+	<order>
         <invoiceNumber>{$this->orderInvoiceNumber}</invoiceNumber>
         <description>{$this->orderDescription}</description>
     </order>

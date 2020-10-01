@@ -7,17 +7,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /*
 Plugin Name: Gravity Forms Authorize.Net Add-On
-Plugin URI: https://www.gravityforms.com
+Plugin URI: https://gravityforms.com
 Description: Integrates Gravity Forms with Authorize.Net, enabling end users to purchase goods and services through Gravity Forms.
-Version: 2.7
-Author: rocketgenius
-Author URI: https://www.rocketgenius.com
+Version: 2.8
+Author: Gravity Forms
+Author URI: https://gravityforms.com
 License: GPL-2.0+
 Text Domain: gravityformsauthorizenet
 Domain Path: /languages
 
 ------------------------------------------------------------------------
-Copyright 2009-2016 rocketgenius
+Copyright 2009-2020 rocketgenius
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-define( 'GF_AUTHORIZENET_VERSION', '2.7' );
+define( 'GF_AUTHORIZENET_VERSION', '2.8' );
 
 add_action( 'gform_loaded', array( 'GF_AuthorizeNet_Bootstrap', 'load' ), 5 );
 

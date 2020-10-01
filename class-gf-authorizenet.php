@@ -254,7 +254,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		//for authorize.net, each feed can have its own login id and transaction key specified which overrides the master plugin one
 		//use the custom settings if found, otherwise use the master plugin settings
 
-		$apiSettingsEnabled = $this->current_feed['meta']['apiSettingsEnabled'];
+		$apiSettingsEnabled = rgars( $this->current_feed, 'meta/apiSettingsEnabled' );
 
 		if ( $apiSettingsEnabled ) {
 
@@ -719,6 +719,28 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		return $wpdb->prefix . 'gf_addon_payment_transaction';
 	}
 
+	/**
+	 * Get the Solution ID.
+	 *
+	 * @since 2.7.2
+	 *
+	 * @see https://developer.authorize.net/api/solution_id.html
+	 *
+	 * @param array $feed Feed settings.
+	 * @return string $solution_id The solution ID.
+	 */
+	public function get_solution_id( $feed ) {
+		$local_settings = $this->get_local_api_settings( $feed );
+		$settings = $this->get_api_settings( $local_settings );
+		if ( 'test' == $settings['mode'] ) {
+			// Authorize.net's generic test Solution ID.
+			$solution_id = 'AAA100302';
+		} else {
+			$solution_id = 'AAA177921';
+		}
+
+		return $solution_id;
+	}
 
 	//------ AUTHORIZE AND CAPTURE SINGLE PAYMENT ------//
 	public function authorize( $feed, $submission_data, $form, $entry ) {
@@ -848,6 +870,7 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		$transaction->customer_ip      = GFFormsModel::get_ip();
 		$transaction->invoice_num      = empty( $invoice_number ) ? uniqid() : $invoice_number; //???
 		$transaction->phone            = $submission_data['phone'];
+		$transaction->solution_id      = $this->get_solution_id( $feed );
 
 		foreach ( $submission_data['line_items'] as $line_item ) {
 			$taxable = rgempty( 'taxable', $line_item ) ? 'Y' : $line_item['taxable'];
@@ -856,7 +879,6 @@ class GFAuthorizeNet extends GFPaymentAddOn {
 		}
 
 		$this->log_debug( __METHOD__ . '(): $submission_data line_items => ' . print_r( $submission_data['line_items'], 1 ) );
-
 		return $transaction;
 
 	}
