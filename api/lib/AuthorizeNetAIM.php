@@ -95,7 +95,7 @@ class AuthorizeNetAIM extends AuthorizeNetRequest
         "ship_to_address","ship_to_city","ship_to_company","ship_to_country",
         "ship_to_first_name","ship_to_last_name","ship_to_state","ship_to_zip",
         "split_tender_id","state","tax","tax_exempt","test_request","tran_key",
-        "trans_id","type","version","zip"
+        "trans_id","type","version","zip","solution_id"
         );
     
     /**

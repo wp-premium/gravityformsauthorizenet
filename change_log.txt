@@ -1,3 +1,9 @@
+### 2.8 | 2020-04-15
+- Added translations for Hebrew, Hindi, Japanese, and Turkish.
+- Add Solution ID to single transactions.
+- Fixed a PHP 7.4 notice on the settings page.
+
+
 ### 2.7 | 2019-08-07
 - Added security enhancements.
 - Removed temporary plugin page.
